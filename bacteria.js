@@ -7,8 +7,10 @@ function Bacteria(game, x, y, radius=10) {
     this.g = getRandomInt(255);
     this.b = getRandomInt(255);
     this.radius = 10;
-    this.xv = 1;
-    this.yv = 1;
+    this.xv = 1 + getRandomInt(2);
+    this.yv = 1 + getRandomInt(2);
+    this.xv *= (Math.random() > 0.5) ? 1 : -1;
+    this.yv *= (Math.random() > 0.5) ? 1 : -1;
 }
 
 
@@ -68,7 +70,7 @@ Bacteria.prototype.collide = function() {
             let distance = Math.sqrt(dx * dx + dy * dy);
             if(distance < this.radius + bacteria[i].radius) {
                 if(!this.lastCollided.includes(bacteria[i])) {
-                    if(this.fitness() < bacteria[i].fitness()) {
+                    if(this.fitness() > bacteria[i].fitness()) {
                         this.radius--;
                     } else {
                         this.radius++;
@@ -85,6 +87,8 @@ Bacteria.prototype.collide = function() {
     if(collided) {
         this.xv = -this.xv;
         this.yv = -this.yv;
+        this.x += 2 * this.xv;
+        this.y += 2 * this.yv;
     }
 }
 
@@ -94,5 +98,5 @@ Bacteria.prototype.fitness = function() {
     let rDist = Math.abs(b.r - this.r);
     let gDist = Math.abs(b.g - this.g);
     let bDist = Math.abs(b.b - this.b);
-    return -rDist - gDist - bDist;
+    return rDist + gDist + bDist;
 }
