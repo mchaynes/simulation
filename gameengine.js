@@ -35,6 +35,9 @@ GameEngine.prototype.start = function () {
 
 GameEngine.prototype.addEntity = function (entity) {
     console.log('added entity');
+    if(entity instanceof Background) {
+        this.background = entity;
+    }
     this.entities.push(entity);
 }
 
@@ -50,11 +53,12 @@ GameEngine.prototype.draw = function () {
 GameEngine.prototype.update = function () {
     var entitiesCount = this.entities.length;
 
+    let removals = [];
     for (var i = 0; i < entitiesCount; i++) {
         var entity = this.entities[i];
-
         entity.update();
     }
+    this.entities = this.entities.filter(x => !x.removeFromWorld);
 }
 
 GameEngine.prototype.loop = function () {

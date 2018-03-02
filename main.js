@@ -54,10 +54,24 @@ function Background(game) {
 };
 
 Background.prototype.draw = function () {
-    this.ctx.fillStyle = "rgb(" + this.r + "," + this.g + "," + this.b + ")";
-    console.log(this.ctx.fillStyle);
+    this.ctx.fillStyle = rgbString(this);
     this.ctx.fillRect(0, 0, 1200, 600);
 };
+
+function rgbString(color) {
+    return "rgb(" + color.r + "," + color.g + "," + color.b + ")";
+}
+
+function getRandomInt(max) {
+    return Math.floor(Math.random() * Math.floor(max));
+}
+
+function getCanvasHeight() {
+    return document.getElementById("land").height;
+}
+function getCanvasWidth() {
+    return document.getElementById("land").width;
+}
 
 Background.prototype.update = function () {
     if(this.coolCount >= this.coolDown) {
@@ -71,32 +85,6 @@ Background.prototype.update = function () {
     
 };
 
-// inheritance 
-function Cheetah(game, x, y, color) {
-    this.animation = this.pantsAnimation;
-    this.speed = 1;
-    this.ctx = game.ctx;
-    Entity.call(this, game, 15, 220);
-}
-
-Cheetah.prototype = new Entity();
-Cheetah.prototype.constructor = Cheetah;
-
-Cheetah.prototype.update = function () {
-
-}
-
-Cheetah.prototype.draw = function () {
-    let ctx = this.ctx;
-    ctx.beginPath();
-    ctx.fillStyle = 'white';
-    ctx.arc(100, 75, 10, 0, 2 * Math.PI, false);
-    ctx.fill();
-    ctx.stroke();
-         
-}
-
-
 AM.queueDownload("./assetmanager.js");
 AM.downloadAll(function () {
     var canvas = document.getElementById("land");
@@ -105,8 +93,11 @@ AM.downloadAll(function () {
     var gameEngine = new GameEngine();
     gameEngine.init(ctx);
     gameEngine.addEntity(new Background(gameEngine));
-    gameEngine.addEntity(new Cheetah(gameEngine));
+    for(let i = 0; i < 30; i++) {
+        let x = getRandomInt(getCanvasWidth() - 10);
+        let y = getRandomInt(getCanvasHeight() - 10);
+        gameEngine.addEntity(new Bacteria(gameEngine, x, y, 5));
+    }
     gameEngine.start();
-
     console.log("All Done!");
 });
