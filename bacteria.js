@@ -1,11 +1,16 @@
-function Bacteria(game, x, y, radius=10) {
+function Bacteria(game, x, y, radius=10, color) {
     this.x = x;
     this.y = y;
     this.game = game;
     this.ctx = game.ctx;
-    this.r = getRandomInt(255);
-    this.g = getRandomInt(255);
-    this.b = getRandomInt(255);
+    color = color || {
+        r: getRandomInt(255),
+        g: getRandomInt(255),
+        b: getRandomInt(255)
+    }
+    this.r = color.r;
+    this.g = color.g;
+    this.b = color.b;
     this.radius = 10;
     this.xv = 1 + getRandomInt(2);
     this.yv = 1 + getRandomInt(2);
@@ -15,11 +20,16 @@ function Bacteria(game, x, y, radius=10) {
 
 
 Bacteria.prototype.update = function() {
-    if(this.isAtRight() || this.isAtLeft()) {
-
+    if(this.isAtRight() && this.xv > 0) {
         this.xv = -this.xv;
     }
-    if(this.isAtTop() || this.isAtBottom()) {
+    if(this.isAtLeft() && this.xv < 0) {
+        this.xv = -this.xv;
+    }
+    if(this.isAtTop() && this.yv < 0) {
+        this.yv = -this.yv;
+    }
+    if(this.isAtBottom() && this.yv > 0) {
         this.yv = -this.yv;
     }
     this.x += this.xv;
@@ -31,6 +41,10 @@ Bacteria.prototype.update = function() {
 }
 
 Bacteria.prototype.draw = function() {
+    if(this.radius < 0) {
+        this.removeFromWorld = true;
+        return;
+    }
     let ctx = this.ctx;
     ctx.beginPath();
     ctx.fillStyle = rgbString(this);
@@ -40,8 +54,10 @@ Bacteria.prototype.draw = function() {
     ctx.fillStyle = 'white';
     ctx.font = "12px serif";
     ctx.lineWidth = 2;
-    ctx.strokeText(this.fitness(), this.x, this.y);
-    ctx.fillText(this.fitness(), this.x, this.y);
+    let tX = this.x - 5;
+    let tY = this.y + 5;
+    ctx.strokeText(this.fitness(), tX, tY);
+    ctx.fillText(this.fitness(), tX, tY);
 }
 
 Bacteria.prototype.isAtBottom = function() {
@@ -71,9 +87,11 @@ Bacteria.prototype.collide = function() {
             if(distance < this.radius + bacteria[i].radius) {
                 if(!this.lastCollided.includes(bacteria[i])) {
                     if(this.fitness() > bacteria[i].fitness()) {
+                        bacteria[i].radius++;
                         this.radius--;
                     } else {
                         this.radius++;
+                        bacteria[i].radius--;
                     }
                     collided = true;
                     this.lastCollided.push(bacteria[i]);

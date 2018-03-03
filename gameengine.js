@@ -14,6 +14,7 @@ function GameEngine() {
     this.ctx = null;
     this.surfaceWidth = null;
     this.surfaceHeight = null;
+    this.swatch = document.getElementById("swatch").getContext("2d");
 }
 
 GameEngine.prototype.init = function (ctx) {
@@ -47,6 +48,8 @@ GameEngine.prototype.draw = function () {
     for (var i = 0; i < this.entities.length; i++) {
         this.entities[i].draw(this.ctx);
     }
+    this.swatch.fillStyle = rgbString(getSwatchRgb());
+    this.swatch.fillRect(0, 0, 1200, 600);
     this.ctx.restore();
 }
 
@@ -101,21 +104,4 @@ Entity.prototype.draw = function (ctx) {
         this.game.ctx.stroke();
         this.game.ctx.closePath();
     }
-}
-
-Entity.prototype.rotateAndCache = function (image, angle) {
-    var offscreenCanvas = document.createElement('canvas');
-    var size = Math.max(image.width, image.height);
-    offscreenCanvas.width = size;
-    offscreenCanvas.height = size;
-    var offscreenCtx = offscreenCanvas.getContext('2d');
-    offscreenCtx.save();
-    offscreenCtx.translate(size / 2, size / 2);
-    offscreenCtx.rotate(angle);
-    offscreenCtx.translate(0, 0);
-    offscreenCtx.drawImage(image, -(image.width / 2), -(image.height / 2));
-    offscreenCtx.restore();
-    //offscreenCtx.strokeStyle = "red";
-    //offscreenCtx.strokeRect(0,0,size,size);
-    return offscreenCanvas;
 }

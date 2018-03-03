@@ -73,7 +73,26 @@ function getCanvasWidth() {
     return document.getElementById("land").width;
 }
 
+function getSwatchRgb() {
+    return {
+        r: parseInt(document.getElementById("r-val").value),
+        g: parseInt(document.getElementById("g-val").value),
+        b: parseInt(document.getElementById("b-val").value)
+    }
+}
+
 Background.prototype.update = function () {
+    if(document.getElementById("checkBox").checked) {
+        this.randomUpdate();
+    } else {
+        let color = getSwatchRgb();
+        this.r = color.r;
+        this.g = color.g;
+        this.b = color.b;
+    }
+};
+
+Background.prototype.randomUpdate = function() {
     if(this.coolCount >= this.coolDown) {
         this.coolCount = 0;
         this.r += (Math.random() > 0.8) ? (Math.random() > 0.4 || this.r === 0) ? 5 : -5 : 0;
@@ -82,8 +101,7 @@ Background.prototype.update = function () {
     } else {
         this.coolCount++;
     }
-    
-};
+}
 
 AM.queueDownload("./assetmanager.js");
 AM.downloadAll(function () {
@@ -98,6 +116,7 @@ AM.downloadAll(function () {
         let y = getRandomInt(getCanvasHeight() - 10);
         gameEngine.addEntity(new Bacteria(gameEngine, x, y, 5));
     }
+
     gameEngine.start();
     console.log("All Done!");
 });

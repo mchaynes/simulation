@@ -6,5 +6,45 @@
     <script src="bacteria.js"></script>
 </head>
 <body>
-    <canvas id='land' tabindex="1" height="600" width="1200"></canvas>
+    <canvas id='land' height="600" width="800" style="float: left;"></canvas>
+
+    <div class="slidecontainer" style="float:right;">
+        <div>
+            <table style="float: left">
+                <tr>
+                    <td>R:</td>
+                    <td>
+                        <input type="range" min="0" max="255" value="50" class="slider" id="r-val">
+                    </td>
+                </tr>
+                <tr>
+                    <td>G:</td>
+                    <td>
+                        <input type="range" min="0" max="255" value="50" class="slider" id="g-val">
+                    </td>
+                </tr>
+                <tr>
+                    <td>B:</td>
+                    <td>
+                        <input type="range" min="0" max="255" value="50" class="slider" id="b-val">
+                    </td>
+                </tr>
+                <tr>
+                    <td>Random Colors</td>
+                    <td>
+                        <input id="checkBox" type="checkbox" checked>
+                    </td>
+                </tr>
+            </table>
+            <canvas id='swatch' height="100" width="100"></canvas>
+        </div>
+        
+    </div>
+            <h1>
+                Explanation:
+            </h1>
+            <p style="word-wrap: break-word; margin-left: 50px;">
+                This simulation is meant to model interactions between agents in a changing environment. The farther the agent's color is from the background color, the higher their score is.
+                When colliding with another agent, the agent with the lower score radius increases, and the other decreases, until the radius is 0 when the agent is removed.
+            </p>
 </body>
