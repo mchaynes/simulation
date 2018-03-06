@@ -49,7 +49,7 @@ function Background(game) {
     this.r = 0;
     this.g = 0;
     this.b = 0;
-    this.coolDown = 10;
+    this.coolDown = 50;
     this.coolCount = 0;
 };
 
@@ -95,9 +95,33 @@ Background.prototype.update = function () {
 Background.prototype.randomUpdate = function() {
     if(this.coolCount >= this.coolDown) {
         this.coolCount = 0;
-        this.r += (Math.random() > 0.8) ? (Math.random() > 0.4 || this.r === 0) ? 5 : -5 : 0;
-        this.g += (Math.random() > 0.8) ? (Math.random() > 0.4 || this.g === 0) ? 5 : -5 : 0;
-        this.b += (Math.random() > 0.8) ? (Math.random() > 0.4 || this.b === 0) ? 5 : -5 : 0;
+        let bacterium = this.game.entities.filter(x => x instanceof Bacteria);
+        let area = {};
+        let max = 0;
+        let maxBacteria;
+        for(i in bacterium) {
+            let bacteria = bacterium[i];
+            let rgbKey = rgbString(bacteria);
+            area[rgbKey] = area[rgbKey] || 1; //undefined is falsy
+            area[rgbKey] += Math.PI * (bacteria.radius * bacteria.radius); // PI * r^2
+            if(area[rgbKey] > max) {
+                max = area[rgbKey];
+                maxBacteria = bacteria;
+            }
+        }
+        this.r += (this.r === maxBacteria.r) ? 0 : (this.r < maxBacteria.r) ? 1 : -1;
+        this.g += (this.g === maxBacteria.g) ? 0 : (this.g < maxBacteria.g) ? 1 : -1;
+        this.b += (this.b === maxBacteria.b) ? 0 : (this.b < maxBacteria.b) ? 1 : -1;
+        let colorCount = 0;
+        for(i in area) {
+            colorCount++;
+        }
+        //Add some randomness
+        if(colorCount > 1) {
+            this.r += (Math.random() > 0.8) ? (Math.random() > 0.4 || this.r === 0) ? 5 : -5 : 0;
+            this.g += (Math.random() > 0.8) ? (Math.random() > 0.4 || this.g === 0) ? 5 : -5 : 0;
+            this.b += (Math.random() > 0.8) ? (Math.random() > 0.4 || this.b === 0) ? 5 : -5 : 0;
+        }
     } else {
         this.coolCount++;
     }
@@ -111,10 +135,18 @@ AM.downloadAll(function () {
     var gameEngine = new GameEngine();
     gameEngine.init(ctx);
     gameEngine.addEntity(new Background(gameEngine));
-    for(let i = 0; i < 30; i++) {
-        let x = getRandomInt(getCanvasWidth() - 10);
-        let y = getRandomInt(getCanvasHeight() - 10);
-        gameEngine.addEntity(new Bacteria(gameEngine, x, y, 5));
+    for(let i = 0; i < 5; i++) {
+        let color = {
+            r: getRandomInt(256),
+            g: getRandomInt(256),
+            b: getRandomInt(256)
+        }
+        for(let j = 0; j < 8; j++) {
+            let x = getRandomInt(getCanvasWidth() - 10);
+            let y = getRandomInt(getCanvasHeight() - 10);
+            gameEngine.addEntity(new Bacteria(gameEngine, x, y, 5, color));
+
+        }
     }
 
     gameEngine.start();

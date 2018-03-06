@@ -56,8 +56,9 @@ Bacteria.prototype.draw = function() {
     ctx.lineWidth = 2;
     let tX = this.x - 5;
     let tY = this.y + 5;
-    ctx.strokeText(this.fitness(), tX, tY);
-    ctx.fillText(this.fitness(), tX, tY);
+    let text = Math.round(100 * this.fitness()) / 100;
+    ctx.strokeText(text, tX, tY);
+    ctx.fillText(text, tX, tY);
 }
 
 Bacteria.prototype.isAtBottom = function() {
@@ -77,32 +78,39 @@ Bacteria.prototype.isAtTop = function() {
 
 Bacteria.prototype.collide = function() {
     this.lastCollided = this.lastCollided || []; // instantiate if this is first update.
-    let bacteria = this.game.entities.filter(x => x instanceof Bacteria);
+    let bacterium = this.game.entities.filter(x => x instanceof Bacteria);
     let collided = false;
-    for(i in bacteria) {
-        if(bacteria[i] !== this) {
-            let dx = this.x - bacteria[i].x;
-            let dy = this.y - bacteria[i].y;
+    for(i in bacterium) {
+        let bacteria = bacterium[i];
+        if(bacteria !== this) {
+            let dx = this.x - bacteria.x;
+            let dy = this.y - bacteria.y;
             let distance = Math.sqrt(dx * dx + dy * dy);
-            if(distance < this.radius + bacteria[i].radius) {
-                if(!this.lastCollided.includes(bacteria[i])) {
-                    if(this.fitness() > bacteria[i].fitness()) {
-                        bacteria[i].radius++;
+            if(distance < this.radius + bacteria.radius) {
+                if(!this.lastCollided.includes(bacteria)) {
+                    if(this.fitness() < bacteria.fitness()) {
+                        bacteria.radius++;
                         this.radius--;
-                    } else {
-                        this.radius++;
-                        bacteria[i].radius--;
+                    } else if(rgbString(this) !== rgbString(bacteria)) {
+                        if(this.radius > 50) {
+                            bacteria.r = this.r;
+                            bacteria.g = this.g;
+                            bacteria.b = this.b;
+                        } else {
+                            this.radius++;
+                            bacteria.radius--;
+                        }
                     }
-                    collided = true;
-                    this.lastCollided.push(bacteria[i]);
+                    collided = bacteria;
+                    this.lastCollided.push(bacteria);
                 } else {
-                    this.lastCollided.pop(bacteria[i]);
+                    this.lastCollided.pop(bacteria);
                 }
 
             }
         }
     }
-    if(collided) {
+    if(collided && rgbString(this) !== rgbString(collided)) {
         this.xv = -this.xv;
         this.yv = -this.yv;
         this.x += 2 * this.xv;
@@ -116,5 +124,7 @@ Bacteria.prototype.fitness = function() {
     let rDist = Math.abs(b.r - this.r);
     let gDist = Math.abs(b.g - this.g);
     let bDist = Math.abs(b.b - this.b);
-    return rDist + gDist + bDist;
+    let total = rDist + gDist + bDist;
+
+    return (total === 0) ? 100 : 100 / total;
 }

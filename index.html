@@ -4,6 +4,11 @@
     <script src='gameengine.js'></script>
     <script src="main.js"></script>
     <script src="bacteria.js"></script>
+    <style>
+            div {
+                padding: 25px 50px 75px;
+            }
+    </style>
 </head>
 <body>
     <canvas id='land' height="600" width="800" style="float: left;"></canvas>
@@ -40,19 +45,18 @@
         </div>
         
     </div>
-            <h2>
-                Explanation:
-            </h2>
-            <p style="word-wrap: break-word; margin-left: 50px;">
-                This simulation is meant to model interactions between agents in a changing environment. The farther the agent's color is from the background color, the higher their score is.
-                When colliding with another agent, the agent with the lower score radius increases, and the other decreases, until the radius is 0 when the agent is removed.
-            </p>
-
-            <h2>
-                Instructions:
-            </h2>
-            <p>
-                You can manually change the colors if you wish using the sliders. The agent's score will adjust as you change the colors. To have the color change, turn off "Random Colors" checkbox.
-                You can turn back on the Random Colors after switching the color.
-            </p>
+    <div style="padding-left: 30px">
+        
+        <h2>
+            Instructions:
+        </h2>
+        <p>
+            You can manually change the colors if you wish using the sliders. The agent's score will adjust as you change the colors. To have the color change, turn off "Random Colors" checkbox.
+            You can turn back on the Random Colors after switching the color.
+        </p>
+        <h2>Rules:</h2>
+        <ul>
+            <li>The farther the circle's color is from the background, the lower its score</li>
+        </ul>
+    </div>
 </body>
