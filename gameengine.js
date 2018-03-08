@@ -35,7 +35,6 @@ GameEngine.prototype.start = function () {
 }
 
 GameEngine.prototype.addEntity = function (entity) {
-    console.log('added entity');
     if(entity instanceof Background) {
         this.background = entity;
     }

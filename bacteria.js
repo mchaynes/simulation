@@ -92,7 +92,7 @@ Bacteria.prototype.collide = function() {
                         bacteria.radius++;
                         this.radius--;
                     } else if(rgbString(this) !== rgbString(bacteria)) {
-                        if(this.radius > 50) {
+                        if(this.radius - bacteria.radius > 75) {
                             bacteria.r = this.r;
                             bacteria.g = this.g;
                             bacteria.b = this.b;
@@ -127,4 +127,19 @@ Bacteria.prototype.fitness = function() {
     let total = rDist + gDist + bDist;
 
     return (total === 0) ? 100 : 100 / total;
+}
+
+Bacteria.prototype.getState = function() {
+    return {
+        x: this.x,
+        y: this.y,
+        radius: this.radius,
+        color : {
+            r: this.r,
+            g: this.g,
+            b: this.b,
+        },
+        xv: this.xv,
+        yv: this.yv
+    };
 }

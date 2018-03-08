@@ -37,26 +37,6 @@ Animation.prototype.currentFrame = function () {
 Animation.prototype.isDone = function () {
     return (this.elapsedTime >= this.totalTime);
 }
-
-// no inheritance
-function Background(game) {
-    this.x = 0;
-    this.y = 0;
-    this.game = game;
-    this.ctx = game.ctx;
-    this.r = 0;
-    this.g = 0;
-    this.b = 0;
-    this.coolDown = 50;
-    this.convergeCount = 0;
-    this.coolCount = 0;
-};
-
-Background.prototype.draw = function () {
-    this.ctx.fillStyle = rgbString(this);
-    this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-};
-
 function rgbString(color) {
     return "rgb(" + color.r + "," + color.g + "," + color.b + ")";
 }
@@ -80,24 +60,26 @@ function getSwatchRgb() {
     }
 }
 
-Background.prototype.update = function () {
-    let converge = document.getElementById("converge").checked;
-    let random = document.getElementById("random").checked;
-    if(random) {
-        this.randomUpdate();
-    } 
-    if(converge) {
-        this.convergeOnMax();
-    }
-    if(!converge && !random) {
-        let color = getSwatchRgb();
-        this.r = color.r;
-        this.g = color.g;
-        this.b = color.b;
-    }
-    
-
+// no inheritance
+function Background(game) {
+    this.x = 0;
+    this.y = 0;
+    this.game = game;
+    this.ctx = game.ctx;
+    this.r = 0;
+    this.g = 0;
+    this.b = 0;
+    this.coolDown = 50;
+    this.convergeCount = 0;
+    this.coolCount = 0;
 };
+
+Background.prototype.draw = function () {
+    this.ctx.fillStyle = rgbString(this);
+    this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+};
+
+
 
 Background.prototype.randomUpdate = function() {
     if(this.coolCount >= this.coolDown) {
@@ -136,6 +118,35 @@ Background.prototype.convergeOnMax = function() {
         this.convergeCount++;
     }
 }
+Background.prototype.update = function () {
+    let converge = document.getElementById("converge").checked;
+    let random = document.getElementById("random").checked;
+    if(random) {
+        this.randomUpdate();
+    } 
+    if(converge) {
+        this.convergeOnMax();
+    }
+    if(converge || random) {
+        document.getElementById("r-val").value = this.r;
+        document.getElementById("g-val").value = this.g;
+        document.getElementById("b-val").value = this.b;
+    } else {
+        let color = getSwatchRgb();
+        this.r = color.r;
+        this.g = color.g;
+        this.b = color.b;
+    }
+}
+
+Background.prototype.getState = function() {
+    return {
+        r: this.r,
+        g: this.g,
+        b: this.b
+    }
+}
+
 
 function Game() {
 
@@ -146,16 +157,24 @@ Game.prototype.ready = function() {
     var ctx = canvas.getContext("2d");
     ctx.canvas.width  = window.innerWidth;
     ctx.canvas.height = window.innerHeight * 0.75;
-    var gameEngine = new GameEngine();
+    var gameEngine;
+    let resetting = this.gameEngine;
+    if(this.gameEngine) {
+        this.gameEngine.entities = [];
+        gameEngine = this.gameEngine;
+    } else {
+        gameEngine = new GameEngine();
+    }
     gameEngine.init(ctx);
-    gameEngine.addEntity(new Background(gameEngine));
-    for(let i = 0; i < 5; i++) {
+    let background = new Background(gameEngine);
+    gameEngine.addEntity(background);
+    for(let i = 0; i < 15; i++) {
         let color = {
             r: getRandomInt(256),
             g: getRandomInt(256),
             b: getRandomInt(256)
         }
-        for(let j = 0; j < 8; j++) {
+        for(let j = 0; j < 3; j++) {
             let radius = 5;
             let x = getRandomInt(getCanvasWidth() - 10);
             let y = getRandomInt(getCanvasHeight() - 10);
@@ -166,7 +185,9 @@ Game.prototype.ready = function() {
         }
     }
     gameEngine.shouldUpdate = false;
-    gameEngine.start();
+    if(!resetting) {
+        gameEngine.start();
+    }
     this.gameEngine = gameEngine;
     console.log("All Done!");
 }

@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <head>
+    <script src="socket.io.js"></script>
     <script src='gameengine.js'></script>
     <script src="main.js"></script>
     <script src="bacteria.js"></script>
+    <script src="save.js"></script>
     <style>
             div {
                 padding: 25px 50px 75px;
@@ -21,7 +23,7 @@
             <td>
                 <table>
                     <tr>
-                        <td><button onclick="game.start()">Start</button></td>
+                        <td><button onclick="game.start()"><strong>Start</strong></button></td>
                         <td><button onclick="game.pause()">Pause</button></td>
                         <td><button onclick="save()">Save</button></td>
                         <td><button onclick="load()">Load</button></td>
@@ -37,32 +39,32 @@
                     <div>
                         <table style="float: left">
                             <tr>
+                                <td><strong>Random Colors</strong></td>
+                                <td>
+                                    <input id="random" type="checkbox" checked>
+                                </td>
+                                <td><strong>Converge</strong></td>
+                                <td>
+                                    <input id="converge" type="checkbox">
+                                </td>
+                            </tr>
+                            <tr>
                                 <td>R:</td>
                                 <td>
-                                    <input type="range" min="0" max="255" value="50" class="slider" id="r-val">
+                                    <input type="range" min="0" max="255" value="0" class="slider" id="r-val">
                                 </td>
                                 <td rowspan="3"><canvas id='swatch' height="100" width="100" style="float: right"></canvas></td>
                             </tr>
                             <tr>
                                 <td>G:</td>
                                 <td>
-                                    <input type="range" min="0" max="255" value="50" class="slider" id="g-val">
+                                    <input type="range" min="0" max="255" value="0" class="slider" id="g-val">
                                 </td>
                             </tr>
                             <tr>
                                 <td>B:</td>
                                 <td>
-                                    <input type="range" min="0" max="255" value="50" class="slider" id="b-val">
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Random Colors</td>
-                                <td>
-                                    <input id="random" type="checkbox" checked>
-                                </td>
-                                <td>Converge</td>
-                                <td>
-                                    <input id="converge" type="checkbox" checked>
+                                    <input type="range" min="0" max="255" value="0" class="slider" id="b-val">
                                 </td>
                             </tr>
                         </table>
@@ -74,8 +76,11 @@
                             <ul>
                                 <li>The farther the circle's color is from the background, the lower its score</li>
                                 <li>When colliding with another circle that has a different color, the circle with the lower score shrinks while the other grows</li>
+                                <li>Circles of the same color don't interact</li>
+                                <li>If the difference between two colliding circles radii is larger than 50, and the larger circles score is higher, it can change the smaller circle's color to its own</li>
                                 <li>If "converge" is turned on, the background will slowly change to the color that occupies the most area</li>
-                                <li>If "random" is turned on, the background will randomly change its rgb values by +-10 per 50 updates</li>
+                                <li>If "random" is turned on, the background will randomly change its rgb values by +-10 per 50 updates, it doesn't pay any attention to whether or not converge is on</li>
+                                <li>To change the background color yourself, turn off Random Colors & Converge</li>
                             </ul>
                         </div>  
                     </td>
