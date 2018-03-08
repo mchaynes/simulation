@@ -54,14 +54,17 @@ GameEngine.prototype.draw = function () {
 }
 
 GameEngine.prototype.update = function () {
-    var entitiesCount = this.entities.length;
+    if(this.shouldUpdate) {
+        var entitiesCount = this.entities.length;
+    
+        let removals = [];
+        for (var i = 0; i < entitiesCount; i++) {
+            var entity = this.entities[i];
+            entity.update();
+        }
+        this.entities = this.entities.filter(x => !x.removeFromWorld);
 
-    let removals = [];
-    for (var i = 0; i < entitiesCount; i++) {
-        var entity = this.entities[i];
-        entity.update();
     }
-    this.entities = this.entities.filter(x => !x.removeFromWorld);
 }
 
 GameEngine.prototype.loop = function () {

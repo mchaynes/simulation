@@ -1,5 +1,3 @@
-var AM = new AssetManager();
-
 function Animation(spriteSheet, frameWidth, frameHeight, sheetWidth, frameDuration, frames, loop, scale) {
     this.spriteSheet = spriteSheet;
     this.frameWidth = frameWidth;
@@ -50,12 +48,13 @@ function Background(game) {
     this.g = 0;
     this.b = 0;
     this.coolDown = 50;
+    this.convergeCount = 0;
     this.coolCount = 0;
 };
 
 Background.prototype.draw = function () {
     this.ctx.fillStyle = rgbString(this);
-    this.ctx.fillRect(0, 0, 1200, 600);
+    this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
 };
 
 function rgbString(color) {
@@ -82,19 +81,40 @@ function getSwatchRgb() {
 }
 
 Background.prototype.update = function () {
-    if(document.getElementById("checkBox").checked) {
+    let converge = document.getElementById("converge").checked;
+    let random = document.getElementById("random").checked;
+    if(random) {
         this.randomUpdate();
-    } else {
+    } 
+    if(converge) {
+        this.convergeOnMax();
+    }
+    if(!converge && !random) {
         let color = getSwatchRgb();
         this.r = color.r;
         this.g = color.g;
         this.b = color.b;
     }
+    
+
 };
 
 Background.prototype.randomUpdate = function() {
     if(this.coolCount >= this.coolDown) {
         this.coolCount = 0;
+        //Add some randomness
+        this.r += (Math.random() > 0.5) ? (Math.random() > 0.5 || this.r === 0) ? 10 : -10 : 0;
+        this.g += (Math.random() > 0.5) ? (Math.random() > 0.5 || this.g === 0) ? 10 : -10 : 0;
+        this.b += (Math.random() > 0.5) ? (Math.random() > 0.5 || this.b === 0) ? 10 : -10 : 0;
+        
+    } else {
+        this.coolCount++;
+    }
+}
+
+Background.prototype.convergeOnMax = function() {
+    if(this.convergeCount >= this.coolDown) {
+        this.convergeCount = 0;
         let bacterium = this.game.entities.filter(x => x instanceof Bacteria);
         let area = {};
         let max = 0;
@@ -112,26 +132,20 @@ Background.prototype.randomUpdate = function() {
         this.r += (this.r === maxBacteria.r) ? 0 : (this.r < maxBacteria.r) ? 1 : -1;
         this.g += (this.g === maxBacteria.g) ? 0 : (this.g < maxBacteria.g) ? 1 : -1;
         this.b += (this.b === maxBacteria.b) ? 0 : (this.b < maxBacteria.b) ? 1 : -1;
-        let colorCount = 0;
-        for(i in area) {
-            colorCount++;
-        }
-        //Add some randomness
-        if(colorCount > 1) {
-            this.r += (Math.random() > 0.8) ? (Math.random() > 0.4 || this.r === 0) ? 5 : -5 : 0;
-            this.g += (Math.random() > 0.8) ? (Math.random() > 0.4 || this.g === 0) ? 5 : -5 : 0;
-            this.b += (Math.random() > 0.8) ? (Math.random() > 0.4 || this.b === 0) ? 5 : -5 : 0;
-        }
     } else {
-        this.coolCount++;
+        this.convergeCount++;
     }
 }
 
-AM.queueDownload("./assetmanager.js");
-AM.downloadAll(function () {
+function Game() {
+
+}
+
+Game.prototype.ready = function() {
     var canvas = document.getElementById("land");
     var ctx = canvas.getContext("2d");
-
+    ctx.canvas.width  = window.innerWidth;
+    ctx.canvas.height = window.innerHeight * 0.75;
     var gameEngine = new GameEngine();
     gameEngine.init(ctx);
     gameEngine.addEntity(new Background(gameEngine));
@@ -142,13 +156,26 @@ AM.downloadAll(function () {
             b: getRandomInt(256)
         }
         for(let j = 0; j < 8; j++) {
+            let radius = 5;
             let x = getRandomInt(getCanvasWidth() - 10);
             let y = getRandomInt(getCanvasHeight() - 10);
-            gameEngine.addEntity(new Bacteria(gameEngine, x, y, 5, color));
+            let onTopOfOther = true;
+
+            gameEngine.addEntity(new Bacteria(gameEngine, x, y, radius, color));
 
         }
     }
-
+    gameEngine.shouldUpdate = false;
     gameEngine.start();
+    this.gameEngine = gameEngine;
     console.log("All Done!");
-});
+}
+Game.prototype.start = function() {
+    this.gameEngine.shouldUpdate = true;
+}
+
+Game.prototype.pause = function() {
+    this.gameEngine.shouldUpdate = false;
+}
+
+var game = new Game();

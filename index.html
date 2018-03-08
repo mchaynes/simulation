@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <head>
-    <script src="assetmanager.js"></script>
     <script src='gameengine.js'></script>
     <script src="main.js"></script>
     <script src="bacteria.js"></script>
@@ -8,55 +7,81 @@
             div {
                 padding: 25px 50px 75px;
             }
+            html, body {
+                width:  100%;
+                height: 100%;
+                margin: 0px;
+            }
     </style>
 </head>
 <body>
-    <canvas id='land' height="600" width="800" style="float: left;"></canvas>
+    <canvas id='land'></canvas>
+    <table>
+        <tr>
+            <td>
+                <table>
+                    <tr>
+                        <td><button onclick="game.start()">Start</button></td>
+                        <td><button onclick="game.pause()">Pause</button></td>
+                        <td><button onclick="save()">Save</button></td>
+                        <td><button onclick="load()">Load</button></td>
+                        <td><button onclick="game.ready()">Reset</button></td>
+                    </tr>
 
-    <div class="slidecontainer" style="float:right;">
-        <div>
-            <table style="float: left">
-                <tr>
-                    <td>R:</td>
-                    <td>
-                        <input type="range" min="0" max="255" value="50" class="slider" id="r-val">
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="slidecontainer">
+                    <div>
+                        <table style="float: left">
+                            <tr>
+                                <td>R:</td>
+                                <td>
+                                    <input type="range" min="0" max="255" value="50" class="slider" id="r-val">
+                                </td>
+                                <td rowspan="3"><canvas id='swatch' height="100" width="100" style="float: right"></canvas></td>
+                            </tr>
+                            <tr>
+                                <td>G:</td>
+                                <td>
+                                    <input type="range" min="0" max="255" value="50" class="slider" id="g-val">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>B:</td>
+                                <td>
+                                    <input type="range" min="0" max="255" value="50" class="slider" id="b-val">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Random Colors</td>
+                                <td>
+                                    <input id="random" type="checkbox" checked>
+                                </td>
+                                <td>Converge</td>
+                                <td>
+                                    <input id="converge" type="checkbox" checked>
+                                </td>
+                            </tr>
+                        </table>
+                        
                     </td>
-                </tr>
-                <tr>
-                    <td>G:</td>
                     <td>
-                        <input type="range" min="0" max="255" value="50" class="slider" id="g-val">
+                        <div style="float: left">
+                            <h2>Rules:</h2>
+                            <ul>
+                                <li>The farther the circle's color is from the background, the lower its score</li>
+                                <li>When colliding with another circle that has a different color, the circle with the lower score shrinks while the other grows</li>
+                                <li>If "converge" is turned on, the background will slowly change to the color that occupies the most area</li>
+                                <li>If "random" is turned on, the background will randomly change its rgb values by +-10 per 50 updates</li>
+                            </ul>
+                        </div>  
                     </td>
-                </tr>
-                <tr>
-                    <td>B:</td>
-                    <td>
-                        <input type="range" min="0" max="255" value="50" class="slider" id="b-val">
-                    </td>
-                </tr>
-                <tr>
-                    <td>Random Colors</td>
-                    <td>
-                        <input id="checkBox" type="checkbox" checked>
-                    </td>
-                </tr>
-            </table>
-            <canvas id='swatch' height="100" width="100"></canvas>
-        </div>
+        </tr>
+    </table>
         
     </div>
-    <div style="padding-left: 30px">
-        
-        <h2>
-            Instructions:
-        </h2>
-        <p>
-            You can manually change the colors if you wish using the sliders. The agent's score will adjust as you change the colors. To have the color change, turn off "Random Colors" checkbox.
-            You can turn back on the Random Colors after switching the color.
-        </p>
-        <h2>Rules:</h2>
-        <ul>
-            <li>The farther the circle's color is from the background, the lower its score</li>
-        </ul>
-    </div>
+    <script>game.ready();</script>
 </body>
